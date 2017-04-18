@@ -6,7 +6,7 @@ jobs:
     environment:
       ANDROID_SDKS: android-14
       ANDROID_TARGET: android-14
-      GRADLE_OPTS: "-XX:MaxPermSize=4g -Xmx4g"
+      #      GRADLE_OPTS: "-XX:MaxPermSize=4g -Xmx4g"
     working_directory: ~/WordPress-Android
     steps:
       - checkout
