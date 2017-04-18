@@ -43,4 +43,4 @@ jobs:
       - run:
           name: Integration Tests
           command: |
-            ./gradlew -PdisablePreDex cIT
+            ./gradlew -PdisablePreDex connectedAndroidTest
