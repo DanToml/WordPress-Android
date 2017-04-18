@@ -18,22 +18,25 @@ jobs:
           name: Lint
           command: ./gradlew -PdisablePreDex lint || (grep -A20 -B2 'severity="Error"' WordPress/build/**/*.xml; exit 1)
       - run:
-          name: Create AVD
-          command: |
-            echo "n" | avdmanager -v create avd -n androidlearn -k "system-images;android-25;google_apis;armeabi-v7a" -c 512M -g google_apis  -d "Nexus 7 2013"
-      - run:
-          name: Run Emulator
-          background: true
-          command: |
-            $ANDROID_HOME/tools/emulator -no-window -noaudio -gpu swiftshader @androidlearn
-      - run:
-          name: Wait for Emulator
-          no_output_timeout: 15m
-          command: |
-            sleep 15
-            adb devices
-            time ./scripts/circle-android wait-for-boot
-      - run:
-          name: Build and Test
-          command: |
-            ./gradlew -PdisablePreDex -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.jvmargs="-Xms512m -Xmx2048m" -Dorg.gradle.daemon=false assembleVanillaRelease connectedAndroidTest --stacktrace --debug
+          name: Assemble Release
+          command: ./gradlew -PdisablePreDex -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.jvmargs="-Xms512m -Xmx2048m" -Dorg.gradle.daemon=false assembleVanillaRelease --stacktrace --debug
+      # - run:
+      #     name: Create AVD
+      #     command: |
+      #       echo "n" | avdmanager -v create avd -n androidlearn -k "system-images;android-25;google_apis;armeabi-v7a" -c 512M -g google_apis  -d "Nexus 7 2013"
+      # - run:
+      #     name: Run Emulator
+      #     background: true
+      #     command: |
+      #       $ANDROID_HOME/tools/emulator -no-window -noaudio -gpu swiftshader @androidlearn
+      # - run:
+      #     name: Wait for Emulator
+      #     no_output_timeout: 15m
+      #     command: |
+      #       sleep 15
+      #       adb devices
+      #       time ./scripts/circle-android wait-for-boot
+      # - run:
+      #     name: Build and Test
+      #     command: |
+      #       ./gradlew -PdisablePreDex -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.jvmargs="-Xms512m -Xmx2048m" -Dorg.gradle.daemon=false assembleVanillaRelease connectedAndroidTest --stacktrace --debug
