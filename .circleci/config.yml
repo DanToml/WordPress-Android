@@ -14,7 +14,6 @@ jobs:
           name: Setup Gradle Properties
           command: |
             cp WordPress/gradle.properties-example WordPress/gradle.properties
-            echo "sdk.dir=$ANDROID_HOME" > local.properties
       - run:
           name: List what is currently installed
           command: sdkmanager --list
@@ -28,18 +27,18 @@ jobs:
           command: |
             $ANDROID_HOME/tools/emulator -no-window -noaudio -gpu swiftshader @androidlearn
       - run:
-          name: Lint
-          command: ./gradlew -PdisablePreDex lint || (grep -A20 -B2 'severity="Error"' WordPress/build/**/*.xml; exit 1)
-      - run:
-          name: Assemble Release
-          command: ./gradlew -PdisablePreDex assembleVanillaRelease
-      - run:
           name: Wait for Emulator
           no_output_timeout: 15m
           command: |
             sleep 15
             adb devices
             time ./scripts/circle-android wait-for-boot
+      - run:
+          name: Lint
+          command: ./gradlew -PdisablePreDex lint || (grep -A20 -B2 'severity="Error"' WordPress/build/**/*.xml; exit 1)
+      - run:
+          name: Assemble Release
+          command: ./gradlew -PdisablePreDex assembleVanillaRelease
       - run:
           name: Integration Tests
           command: |
