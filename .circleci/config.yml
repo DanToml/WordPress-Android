@@ -6,7 +6,7 @@ jobs:
     environment:
       ANDROID_SDKS: android-14
       ANDROID_TARGET: android-14
-      GRADLE_OPTS: "-XX:MaxPermSize=4g -Xmx4g"
+      GRADLE_OPTS: "-XX:MaxPermSize=6g -Xmx6g"
     working_directory: ~/WordPress-Android
     steps:
       - checkout
@@ -38,7 +38,7 @@ jobs:
           command: ./gradlew -PdisablePreDex lint || (grep -A20 -B2 'severity="Error"' WordPress/build/**/*.xml; exit 1)
       - run:
           name: Assemble Release
-          command: ./gradlew -PdisablePreDex assembleVanillaRelease
+          command: ./gradlew -PdisablePreDex -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.daemon=false assembleVanillaRelease
       - run:
           name: Integration Tests
           command: |
