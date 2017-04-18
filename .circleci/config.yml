@@ -12,7 +12,9 @@ jobs:
       - checkout
       - run:
           name: Setup Gradle Properties
-          command: cp WordPress/gradle.properties-example WordPress/gradle.properties
+          command: |
+            cp WordPress/gradle.properties-example WordPress/gradle.properties
+            echo "sdk.dir=$ANDROID_HOME" > local.properties
       - run:
           name: List what is currently installed
           command: sdkmanager --list
