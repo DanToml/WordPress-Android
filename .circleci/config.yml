@@ -26,21 +26,19 @@ jobs:
           command: |
             $ANDROID_HOME/tools/emulator -no-window -noaudio -gpu swiftshader @androidlearn
       - run:
-          name: Run Android Build and Lint
-          command: |
-            ./gradlew -PdisablePreDex assembleVanillaRelease lint || (grep -A20 -B2 'severity="Error"' WordPress/build/**/*.xml; exit 1)
+          name: Lint
+          command: ./gradlew -PdisablePreDex lint || (grep -A20 -B2 'severity="Error"' WordPress/build/**/*.xml; exit 1)
+      - run:
+          name: Assemble Release
+          command: ./gradlew -PdisablePreDex assembleVanillaRelease
       - run:
           name: Wait for Emulator
           no_output_timeout: 15m
           command: |
             sleep 15
             adb devices
-      - run:
-          name: Wait for Boot
-          command: |
-            # Wait for emulator to fully boot
             time ./scripts/circle-android wait-for-boot
       - run:
-          name: Run Android Integration Tests
+          name: Integration Tests
           command: |
             ./gradlew -PdisablePreDex cIT
