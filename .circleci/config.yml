@@ -15,8 +15,11 @@ jobs:
           command: |
             cp WordPress/gradle.properties-example WordPress/gradle.properties
       - run:
-          name: List what is currently installed
-          command: sdkmanager --list
+          name: Lint
+          command: ./gradlew -PdisablePreDex lint || (grep -A20 -B2 'severity="Error"' WordPress/build/**/*.xml; exit 1)
+      - run:
+          name: Assemble Release
+          command: ./gradlew -PdisablePreDex -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.daemon=false assembleVanillaRelease
       - run:
           name: Create AVD
           command: |
@@ -33,12 +36,6 @@ jobs:
             sleep 15
             adb devices
             time ./scripts/circle-android wait-for-boot
-      - run:
-          name: Lint
-          command: ./gradlew -PdisablePreDex lint || (grep -A20 -B2 'severity="Error"' WordPress/build/**/*.xml; exit 1)
-      - run:
-          name: Assemble Release
-          command: ./gradlew -PdisablePreDex -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.daemon=false assembleVanillaRelease
       - run:
           name: Integration Tests
           command: |
