@@ -6,16 +6,22 @@ jobs:
     environment:
       ANDROID_SDKS: android-14
       ANDROID_TARGET: android-14
-      #      GRADLE_OPTS: "-XX:MaxPermSize=4g -Xmx4g"
+      GRADLE_USER_HOME: ~/WordPress-Android/.gradle
     working_directory: ~/WordPress-Android
     steps:
       - checkout
       - run:
           name: Setup Gradle Properties
           command: cp WordPress/gradle.properties-example WordPress/gradle.properties
+      - restore_cache:
+          key: << checksum "WordPress/build.gradle" >>
       - run:
           name: Lint
           command: ./gradlew -PdisablePreDex lint || (grep -A20 -B2 'severity="Error"' WordPress/build/**/*.xml; exit 1)
+      - save_cache:
+          key: << checksum "WordPress/build.gradle" >>
+          paths:
+            - .gradle/caches
       - run:
           name: Build
           command: ./gradlew -PdisablePreDex -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.jvmargs="-Xms512m -Xmx2048m" -Dorg.gradle.daemon=false assembleVanillaRelease
