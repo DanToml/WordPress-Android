@@ -1,0 +1,37 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: drazisil/android-sdk:1.2.60
+    working_directory: ~/WordPress-Android
+    steps:
+      - checkout
+      - run: mkdir artifacts
+      - run:
+          name: List what is currently installed
+          command: sdkmanager --list
+      - run:
+          name: Create AVD
+          command: |
+            echo "n" | avdmanager -v create avd -n androidlearn -k "system-images;android-25;google_apis;armeabi-v7a" -c 512M -g google_apis  -d "Nexus 7 2013"
+      - run:
+          name: Run Emulator
+          background: true
+          command: |
+            $ANDROID_HOME/tools/emulator -no-window -noaudio -gpu swiftshader @androidlearn
+      - run:
+          name: Wait for Emulator
+          no_output_timeout: 15m
+          command: |
+            sleep 15
+            adb devices
+      - run:
+          name: Run Android Connected Tests
+          command: |
+            # ./scripts/test.sh
+
+            # Wait for emulator to fully boot
+            time ./scripts/circle-android wait-for-boot
+
+            # Run the test
+            ./gradlew -PdisablePreDex assembleVanillaRelease lint || (grep -A20 -B2 'severity="Error"' WordPress/build/**/*.xml; exit 1)
