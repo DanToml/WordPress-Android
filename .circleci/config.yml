@@ -26,12 +26,15 @@ jobs:
             sleep 15
             adb devices
       - run:
-          name: Run Android Connected Tests
+          name: Wait for Boot
           command: |
-            # ./scripts/test.sh
-
             # Wait for emulator to fully boot
             time ./scripts/circle-android wait-for-boot
-
-            # Run the test
+      - run:
+          name: Run Android Build and Lint
+          command: |
             ./gradlew -PdisablePreDex assembleVanillaRelease lint || (grep -A20 -B2 'severity="Error"' WordPress/build/**/*.xml; exit 1)
+      - run:
+          name: Run Android Integration Tests
+          command: |
+            ./gradlew -PdisablePreDex cIT
