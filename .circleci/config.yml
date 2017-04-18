@@ -10,7 +10,9 @@ jobs:
     working_directory: ~/WordPress-Android
     steps:
       - checkout
-      - run: mkdir artifacts
+      - run:
+          name: Setup Gradle Properties
+          command: cp WordPress/gradle.properties-example WordPress/gradle.properties
       - run:
           name: List what is currently installed
           command: sdkmanager --list
@@ -24,6 +26,10 @@ jobs:
           command: |
             $ANDROID_HOME/tools/emulator -no-window -noaudio -gpu swiftshader @androidlearn
       - run:
+          name: Run Android Build and Lint
+          command: |
+            ./gradlew -PdisablePreDex assembleVanillaRelease lint || (grep -A20 -B2 'severity="Error"' WordPress/build/**/*.xml; exit 1)
+      - run:
           name: Wait for Emulator
           no_output_timeout: 15m
           command: |
@@ -34,13 +40,6 @@ jobs:
           command: |
             # Wait for emulator to fully boot
             time ./scripts/circle-android wait-for-boot
-      - run:
-          name: Setup Gradle Properties
-          command: cp WordPress/gradle.properties-example WordPress/gradle.properties
-      - run:
-          name: Run Android Build and Lint
-          command: |
-            ./gradlew -PdisablePreDex assembleVanillaRelease lint || (grep -A20 -B2 'severity="Error"' WordPress/build/**/*.xml; exit 1)
       - run:
           name: Run Android Integration Tests
           command: |
