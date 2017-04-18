@@ -3,6 +3,9 @@ jobs:
   build:
     docker:
       - image: drazisil/android-sdk:1.2.60
+    environment:
+      ANDROID_SDKS: android-14
+      ANDROID_TARGET: android-14
     working_directory: ~/WordPress-Android
     steps:
       - checkout
@@ -30,6 +33,9 @@ jobs:
           command: |
             # Wait for emulator to fully boot
             time ./scripts/circle-android wait-for-boot
+      - run:
+          name: Setup Gradle Properties
+          command: cp WordPress/gradle.properties-example WordPress/gradle.properties
       - run:
           name: Run Android Build and Lint
           command: |
