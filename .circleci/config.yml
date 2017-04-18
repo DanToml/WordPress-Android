@@ -19,7 +19,7 @@ jobs:
           command: ./gradlew -PdisablePreDex lint || (grep -A20 -B2 'severity="Error"' WordPress/build/**/*.xml; exit 1)
       - run:
           name: Assemble Release
-          command: ./gradlew -PdisablePreDex -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.daemon=false assembleVanillaRelease --stacktrace --debug
+          command: ./gradlew -PdisablePreDex -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.jvmargs="-Xms512m -Xmx2048m" -Dorg.gradle.daemon=false assembleVanillaRelease --stacktrace --debug
       - run:
           name: Create AVD
           command: |
